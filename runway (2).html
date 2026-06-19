@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Runway — Study & Career Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EEF1ED;
+    --card:#FBFCFA;
+    --ink:#182420;
+    --ink-soft:#5A6660;
+    --line:#CBD4CC;
+    --amber:#E2933D;
+    --teal:#2F6F62;
+    --green:#3F7D55;
+    --coral:#C75C4B;
+    --gray:#9CA8A1;
+    --radius:12px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Inter',sans-serif;
+    color:var(--ink);
+    background-color:var(--paper);
+    background-image:
+      linear-gradient(rgba(0,0,0,0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,0,0,0.035) 1px, transparent 1px);
+    background-size:28px 28px;
+    min-height:100vh;
+  }
+  h1,h2,h3{font-family:'Fraunces',serif; margin:0; letter-spacing:-0.01em;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+  .app{display:flex; min-height:100vh;}
+
+  /* NAV */
+  .nav{
+    width:230px; flex-shrink:0; background:var(--card);
+    border-right:1px solid var(--line);
+    padding:28px 16px; display:flex; flex-direction:column;
+    position:sticky; top:0; height:100vh;
+  }
+  .brand{font-size:24px; font-weight:700; display:flex; align-items:baseline; gap:6px;}
+  .brand em{font-style:italic; color:var(--teal); font-weight:500;}
+  .brand-tag{font-size:12.5px; color:var(--ink-soft); margin:4px 0 26px;}
+  .nav-btn{
+    display:flex; align-items:center; gap:10px; width:100%;
+    background:transparent; border:none; text-align:left;
+    padding:10px 12px; border-radius:9px; cursor:pointer;
+    font-family:'Inter',sans-serif; font-size:14.5px; font-weight:500;
+    color:var(--ink-soft); margin-bottom:2px;
+  }
+  .nav-btn svg{width:18px;height:18px; flex-shrink:0;}
+  .nav-btn:hover{background:rgba(47,111,98,0.08); color:var(--ink);}
+  .nav-btn.active{background:var(--teal); color:#fff;}
+  .nav-footer{margin-top:auto; padding-top:14px; border-top:1px solid var(--line);}
+  .reset-link{
+    border:none; background:none; color:var(--ink-soft); font-size:12px;
+    cursor:pointer; font-family:'Inter',sans-serif; padding:6px 12px;
+    text-decoration:underline; text-decoration-color:var(--line);
+  }
+  .reset-link:hover{color:var(--coral);}
+
+  /* MAIN */
+  .main{flex:1; padding:36px 44px; max-width:1140px;}
+  .view{display:none;}
+  .view.active{display:block; animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;}}
+  .view-head{margin-bottom:24px;}
+  .view-head h2{font-size:26px; font-weight:600;}
+  .view-head p{color:var(--ink-soft); margin:6px 0 0; font-size:14.5px;}
+
+  .banner{
+    background:#FDF1E7; border:1px solid var(--amber); border-radius:var(--radius);
+    padding:12px 16px; font-size:13.5px; color:#7A5320; margin-bottom:20px;
+  }
+
+  /* CARDS */
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:20px;
+  }
+  .grid-cards{display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin-bottom:26px;}
+  .stat .stat-num{font-family:'Fraunces',serif; font-size:30px; font-weight:600;}
+  .stat .stat-label{font-size:12.5px; color:var(--ink-soft); margin-top:2px;}
+  .two-col{display:grid; grid-template-columns:1.3fr 1fr; gap:18px;}
+
+  /* FORMS */
+  .field{display:flex; flex-direction:column; gap:5px; margin-bottom:12px;}
+  .field label{font-size:12.5px; font-weight:600; color:var(--ink-soft);}
+  .row-2{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  .row-3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;}
+  .row-4{display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px;}
+  input,select,textarea{
+    font-family:'Inter',sans-serif; font-size:14px; color:var(--ink);
+    border:1px solid var(--line); border-radius:8px; padding:9px 11px;
+    background:#fff; width:100%;
+  }
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--teal); outline-offset:1px;}
+  textarea{resize:vertical; min-height:54px;}
+  .btn{
+    font-family:'Inter',sans-serif; font-weight:600; font-size:13.5px;
+    border-radius:8px; padding:9px 16px; cursor:pointer; border:1px solid transparent;
+  }
+  .btn-primary{background:var(--teal); color:#fff;}
+  .btn-primary:hover{background:#255A4F;}
+  .btn-ghost{background:transparent; border:1px solid var(--line); color:var(--ink-soft);}
+  .btn-ghost:hover{border-color:var(--ink-soft); color:var(--ink);}
+  .btn-row{display:flex; gap:10px; margin-top:4px;}
+
+  /* BADGES */
+  .badge{
+    font-family:'JetBrains Mono',monospace; font-size:10.5px; font-weight:500;
+    padding:3px 9px; border-radius:20px; text-transform:uppercase; letter-spacing:.03em;
+    color:#fff; display:inline-block;
+  }
+  .tag{
+    font-family:'JetBrains Mono',monospace; font-size:11px;
+    padding:2px 8px; border-radius:6px; background:rgba(47,111,98,0.1);
+    color:var(--teal); display:inline-flex; align-items:center; gap:5px;
+  }
+  .tag-dot{width:6px;height:6px;border-radius:50%; flex-shrink:0;}
+
+  /* LIST ITEMS */
+  .item-card{
+    border:1px solid var(--line); border-radius:var(--radius); background:var(--card);
+    padding:16px 18px; margin-bottom:10px;
+  }
+  .item-top{display:flex; justify-content:space-between; align-items:flex-start; gap:12px;}
+  .item-title{font-weight:600; font-size:15px;}
+  .item-sub{font-size:13px; color:var(--ink-soft); margin-top:2px;}
+  .item-meta{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
+  .item-actions{display:flex; gap:8px; flex-shrink:0;}
+  .icon-btn{
+    border:none; background:transparent; cursor:pointer; color:var(--ink-soft);
+    font-size:12px; font-family:'Inter',sans-serif; padding:4px 6px; border-radius:6px;
+  }
+  .icon-btn:hover{background:rgba(0,0,0,0.05); color:var(--ink);}
+  .icon-btn.danger:hover{color:var(--coral);}
+
+  .empty{
+    text-align:center; padding:34px 18px; color:var(--ink-soft); font-size:14px;
+    border:1px dashed var(--line); border-radius:var(--radius);
+  }
+
+  /* RUNWAY STRIP — signature skill-level element */
+  .runway{display:flex; gap:3px; align-items:center;}
+  .runway span{width:14px; height:7px; border-radius:2px; background:var(--line); display:block;}
+  .runway-label{font-family:'JetBrains Mono',monospace; font-size:11px; margin-left:8px; color:var(--ink-soft);}
+
+  /* TIMETABLE */
+  .day-pills{display:flex; gap:6px; margin-bottom:18px; flex-wrap:wrap;}
+  .day-pill{
+    border:1px solid var(--line); background:#fff; border-radius:20px;
+    padding:7px 16px; font-size:13px; font-weight:600; cursor:pointer; color:var(--ink-soft);
+    font-family:'Inter',sans-serif;
+  }
+  .day-pill.active{background:var(--ink); color:#fff; border-color:var(--ink);}
+  .slot-row{
+    display:flex; justify-content:space-between; align-items:center;
+    border:1px solid var(--line); border-radius:9px; padding:10px 14px; margin-bottom:8px; background:#fff;
+  }
+  .slot-time{font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--teal); min-width:110px;}
+
+  /* COURSE TRACKER */
+  .progress-track{
+    height:8px; background:var(--line); border-radius:6px; overflow:hidden; flex:1;
+  }
+  .progress-fill{height:100%; border-radius:6px; background:var(--teal); transition:width .3s ease;}
+  .progress-row{display:flex; align-items:center; gap:10px; margin-top:10px;}
+  .progress-pct{font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--ink-soft); min-width:38px; text-align:right;}
+  .course-stats{display:flex; gap:16px; flex-wrap:wrap; margin-top:10px;}
+  .course-stat{font-size:12.5px; color:var(--ink-soft);}
+  .course-stat b{font-family:'JetBrains Mono',monospace; font-weight:500; color:var(--ink);}
+  .dash-course-row{margin-bottom:14px;}
+  .dash-course-row:last-child{margin-bottom:0;}
+  .dash-course-top{display:flex; justify-content:space-between; font-size:13.5px; margin-bottom:6px;}
+  .dash-course-top span:last-child{font-family:'JetBrains Mono',monospace; color:var(--ink-soft); font-size:12px;}
+
+  /* QUEUE */
+  .queue-item{display:flex; align-items:flex-start; gap:12px;}
+  .queue-check{
+    width:20px; height:20px; border:2px solid var(--line); border-radius:6px;
+    flex-shrink:0; margin-top:1px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    background:#fff;
+  }
+  .queue-check.done{background:var(--green); border-color:var(--green); color:#fff; font-size:13px;}
+  .queue-item.is-done .item-title{text-decoration:line-through; color:var(--ink-soft);}
+  .reorder{display:flex; flex-direction:column; gap:2px;}
+
+  @media (max-width:760px){
+    .app{flex-direction:column;}
+    .nav{width:100%; height:auto; position:relative; flex-direction:row; align-items:center; overflow-x:auto; gap:4px; padding:14px 14px;}
+    .brand,.brand-tag,.nav-footer{display:none;}
+    .nav-btn{white-space:nowrap;}
+    .main{padding:22px 18px;}
+    .grid-cards{grid-template-columns:repeat(2,1fr);}
+    .two-col{grid-template-columns:1fr;}
+    .row-2,.row-3,.row-4{grid-template-columns:1fr;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .view.active{animation:none;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <aside class="nav">
+    <div class="brand">Runway<em>.</em></div>
+    <div class="brand-tag">Study now. Get hired later.</div>
+
+    <button class="nav-btn active" data-view="dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+      Dashboard
+    </button>
+    <button class="nav-btn" data-view="jobs">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2.5" y="7" width="19" height="13" rx="2"/><path d="M8 7V5.5A1.5 1.5 0 0 1 9.5 4h5A1.5 1.5 0 0 1 16 5.5V7"/><path d="M2.5 12h19"/></svg>
+      Job Postings
+    </button>
+    <button class="nav-btn" data-view="timetable">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5h18M8 3v3M16 3v3"/></svg>
+      Study Timetable
+    </button>
+    <button class="nav-btn" data-view="courses">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="7" width="4" height="14" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg>
+      Course Tracker
+    </button>
+    <button class="nav-btn" data-view="skills">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="0.6" fill="currentColor"/></svg>
+      Skills Needed
+    </button>
+    <button class="nav-btn" data-view="queue">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h11M4 12h11M4 18h7"/><path d="M18 16l2 2 3.2-3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Study Next
+    </button>
+
+    <div class="nav-footer">
+      <button class="reset-link" id="resetBtn">Clear all my data</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div id="banner-slot"></div>
+
+    <!-- DASHBOARD -->
+    <section class="view active" id="view-dashboard">
+      <div class="view-head">
+        <h2 id="greeting">Welcome back</h2>
+        <p>Here's where your job search and your study time actually meet.</p>
+      </div>
+      <div class="grid-cards">
+        <div class="card stat"><div class="stat-num mono" id="statJobs">0</div><div class="stat-label">Open job postings</div></div>
+        <div class="card stat"><div class="stat-num mono" id="statDeadlines">0</div><div class="stat-label">Deadlines this week</div></div>
+        <div class="card stat"><div class="stat-num mono" id="statSkills">0</div><div class="stat-label">Skills in progress</div></div>
+        <div class="card stat"><div class="stat-num mono" id="statQueue">0</div><div class="stat-label">Items in study queue</div></div>
+        <div class="card stat"><div class="stat-num mono" id="statCourses">—</div><div class="stat-label">Avg. course progress</div></div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <h3 style="font-size:17px; margin-bottom:12px;">Today's study block</h3>
+          <div id="dashToday"></div>
+        </div>
+        <div class="card">
+          <h3 style="font-size:17px; margin-bottom:12px;">Top of your queue</h3>
+          <div id="dashQueue"></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:18px;">
+        <h3 style="font-size:17px; margin-bottom:4px;">Course progress</h3>
+        <p style="color:var(--ink-soft); font-size:13px; margin:0 0 14px;">Furthest-behind courses show first.</p>
+        <div id="dashCourses"></div>
+      </div>
+    </section>
+
+    <!-- JOB POSTINGS -->
+    <section class="view" id="view-jobs">
+      <div class="view-head">
+        <h2>Job Postings</h2>
+        <p>Track roles you're aiming for, their deadlines, and the skills each one wants.</p>
+      </div>
+      <div class="card" style="margin-bottom:22px;">
+        <div class="row-2">
+          <div class="field"><label>Role title</label><input id="jobTitle" placeholder="e.g. Junior Data Analyst"></div>
+          <div class="field"><label>Company</label><input id="jobCompany" placeholder="e.g. Northwind Labs"></div>
+        </div>
+        <div class="row-3">
+          <div class="field"><label>Application deadline</label><input id="jobDeadline" type="date"></div>
+          <div class="field"><label>Status</label>
+            <select id="jobStatus">
+              <option>Saved</option><option>Applied</option><option>Interviewing</option><option>Offer</option><option>Rejected</option><option>Closed</option>
+            </select>
+          </div>
+          <div class="field"><label>Posting link</label><input id="jobLink" placeholder="https://..."></div>
+        </div>
+        <div class="field"><label>Skills it asks for (comma separated)</label><input id="jobSkills" placeholder="e.g. SQL, Excel, communication"></div>
+        <div class="field"><label>Notes</label><textarea id="jobNotes" placeholder="Anything worth remembering about this one"></textarea></div>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="jobSubmit">Add posting</button>
+          <button class="btn btn-ghost" id="jobCancel" style="display:none;">Cancel</button>
+        </div>
+      </div>
+      <div id="jobsList"></div>
+    </section>
+
+    <!-- TIMETABLE -->
+    <section class="view" id="view-timetable">
+      <div class="view-head">
+        <h2>Study Timetable</h2>
+        <p>Lay out what you're studying, and when, day by day.</p>
+      </div>
+      <div class="day-pills" id="dayPills"></div>
+      <div class="card" style="margin-bottom:18px;">
+        <div class="row-2">
+          <div class="field"><label>Time</label><input id="slotTime" placeholder="e.g. 9:00–10:30"></div>
+          <div class="field"><label>What you're studying</label><input id="slotSubject" placeholder="e.g. Statistics — Ch. 4"></div>
+        </div>
+        <button class="btn btn-primary" id="slotSubmit">Add to this day</button>
+      </div>
+      <div id="slotsList"></div>
+    </section>
+
+    <!-- COURSE TRACKER -->
+    <section class="view" id="view-courses">
+      <div class="view-head">
+        <h2>Course Tracker</h2>
+        <p>Track lecture backlog across your courses, and see when you'll actually finish each one.</p>
+      </div>
+      <div class="card" style="margin-bottom:22px;">
+        <div class="row-2">
+          <div class="field"><label>Course name</label><input id="courseName" placeholder="e.g. DSA"></div>
+          <div class="field"><label>Lecture length (minutes)</label><input id="courseMinutes" type="number" min="1" placeholder="45"></div>
+        </div>
+        <div class="row-3">
+          <div class="field"><label>Total lectures</label><input id="courseTotal" type="number" min="1" placeholder="60"></div>
+          <div class="field"><label>Completed lectures</label><input id="courseCompleted" type="number" min="0" placeholder="0"></div>
+          <div class="field"><label>Your pace (lectures/day, optional)</label><input id="coursePace" type="number" min="0" step="0.5" placeholder="2"></div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="courseSubmit">Add course</button>
+          <button class="btn btn-ghost" id="courseCancel" style="display:none;">Cancel</button>
+        </div>
+      </div>
+      <div id="coursesList"></div>
+    </section>
+
+    <!-- SKILLS -->
+    <section class="view" id="view-skills">
+      <div class="view-head">
+        <h2>Skills Needed</h2>
+        <p>Skills land here automatically from job postings — track how close you are to each one.</p>
+      </div>
+      <div class="card" style="margin-bottom:22px;">
+        <div class="row-2">
+          <div class="field"><label>Skill</label><input id="skillName" placeholder="e.g. SQL"></div>
+          <div class="field"><label>Where to learn it (optional link)</label><input id="skillResource" placeholder="https://..."></div>
+        </div>
+        <div class="field"><label>Notes</label><textarea id="skillNotes" placeholder="Course, book, anything to remember"></textarea></div>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="skillSubmit">Add skill</button>
+          <button class="btn btn-ghost" id="skillCancel" style="display:none;">Cancel</button>
+        </div>
+      </div>
+      <div id="skillsList"></div>
+    </section>
+
+    <!-- QUEUE -->
+    <section class="view" id="view-queue">
+      <div class="view-head">
+        <h2>What to Study Next</h2>
+        <p>Your ordered, actionable queue. Top of the list is what to open right now.</p>
+      </div>
+      <div class="card" style="margin-bottom:18px;">
+        <div class="row-3">
+          <div class="field"><label>Task</label><input id="queueTitle" placeholder="e.g. Finish SQL joins module"></div>
+          <div class="field"><label>Linked skill (optional)</label><select id="queueSkill"><option value="">— none —</option></select></div>
+          <div class="field"><label>Priority</label>
+            <select id="queuePriority"><option>High</option><option selected>Medium</option><option>Low</option></select>
+          </div>
+        </div>
+        <div class="field" style="max-width:200px;"><label>Estimated minutes</label><input id="queueMinutes" type="number" min="5" step="5" placeholder="60"></div>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="queueSubmit">Add to queue</button>
+          <button class="btn btn-ghost" id="suggestBtn">Suggest from skills</button>
+        </div>
+      </div>
+      <div id="queueList"></div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- storage layer ----------
+     Plain browser localStorage. Everything you add lives in this
+     specific browser, on this specific device. Falls back to an
+     in-memory variable only if localStorage itself is blocked
+     (e.g. private/incognito mode in some browsers), in which case
+     data won't survive a reload — the banner below will say so. */
+  var storageMode = 'local'; // 'local' | 'memory'
+  var memoryFallback = {};
+  var LS_PREFIX = 'runway:';
+
+  async function storeGet(key, fallback){
+    try{
+      var raw = window.localStorage.getItem(LS_PREFIX + key);
+      storageMode = 'local';
+      return raw ? JSON.parse(raw) : fallback;
+    }catch(e){
+      storageMode = 'memory';
+      return (key in memoryFallback) ? memoryFallback[key] : fallback;
+    }
+  }
+  async function storeSet(key, value){
+    memoryFallback[key] = value;
+    try{
+      window.localStorage.setItem(LS_PREFIX + key, JSON.stringify(value));
+      storageMode = 'local';
+    }catch(e){
+      storageMode = 'memory';
+    }
+  }
+  async function storeDeleteAll(){
+    for (var k of ['jobs','skills','timetable','queue','courses']){
+      memoryFallback[k] = undefined;
+      try{ window.localStorage.removeItem(LS_PREFIX + k); }catch(e){}
+    }
+  }
+
+  function renderBanner(){
+    var slot = document.getElementById('banner-slot');
+    if (storageMode === 'memory'){
+      slot.innerHTML = '<div class="banner">Heads up — this browser won\'t let the page save anything (storage is blocked or disabled, often the case in private/incognito mode), so what you add will disappear on reload.</div>';
+    } else {
+      slot.innerHTML = '';
+    }
+  }
+
+  /* ---------- state ---------- */
+  var state = {
+    jobs: [],
+    skills: [],
+    timetable: {Mon:[],Tue:[],Wed:[],Thu:[],Fri:[],Sat:[],Sun:[]},
+    queue: [],
+    courses: []
+  };
+  var currentDay = 'Mon';
+  var editingJobId = null;
+  var editingSkillId = null;
+  var editingCourseId = null;
+
+  function uid(){ return 'id' + Math.random().toString(36).slice(2,9) + Date.now().toString(36); }
+  function esc(str){
+    return String(str==null ? '' : str)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function fmtDate(d){
+    if (!d) return '';
+    var dt = new Date(d + 'T00:00:00');
+    if (isNaN(dt)) return d;
+    return dt.toLocaleDateString(undefined,{month:'short', day:'numeric', year:'numeric'});
+  }
+  function daysUntil(d){
+    if (!d) return null;
+    var dt = new Date(d + 'T00:00:00');
+    var today = new Date(); today.setHours(0,0,0,0);
+    return Math.round((dt - today) / 86400000);
+  }
+
+  var STATUS = {
+    Saved:'#9CA8A1', Applied:'#2F6F62', Interviewing:'#E2933D',
+    Offer:'#3F7D55', Rejected:'#C75C4B', Closed:'#5A6660'
+  };
+  var LEVELS = [
+    {label:'Not started', color:'#9CA8A1'},
+    {label:'Learning', color:'#E2933D'},
+    {label:'Comfortable', color:'#2F6F62'},
+    {label:'Strong', color:'#3F7D55'}
+  ];
+  var PRIORITY_COLOR = {High:'#C75C4B', Medium:'#E2933D', Low:'#9CA8A1'};
+  var DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+  function runwayHTML(level, withLabel){
+    var lvl = LEVELS[level] || LEVELS[0];
+    var html = '<div class="runway">';
+    for (var i=0;i<4;i++){
+      html += '<span style="' + (i<=level ? 'background:'+lvl.color+';' : '') + '"></span>';
+    }
+    html += '</div>';
+    if (withLabel) html += '<span class="runway-label">' + esc(lvl.label) + '</span>';
+    return html;
+  }
+
+  /* ---------- skill helpers ---------- */
+  function findOrCreateSkill(name){
+    var clean = name.trim();
+    if (!clean) return null;
+    var existing = state.skills.find(function(s){ return s.name.toLowerCase() === clean.toLowerCase(); });
+    if (existing) return existing;
+    var s = {id: uid(), name: clean, level: 0, resource:'', notes:''};
+    state.skills.push(s);
+    return s;
+  }
+  function jobsNeedingSkill(skillName){
+    return state.jobs.filter(function(j){
+      return j.skills.some(function(sk){ return sk.toLowerCase() === skillName.toLowerCase(); });
+    });
+  }
+
+  /* ---------- course helpers ---------- */
+  function courseStats(c){
+    var total = c.totalLectures || 0;
+    var done = Math.min(c.completedLectures || 0, total);
+    var percent = total > 0 ? Math.round((done / total) * 100) : 0;
+    var minutes = c.lectureMinutes || 0;
+    var hoursCompleted = (done * minutes) / 60;
+    var remainingLectures = Math.max(total - done, 0);
+    var hoursRemaining = (remainingLectures * minutes) / 60;
+    var daysRemaining = null, etaText = 'set a pace to see an ETA';
+    if (c.pacePerDay && c.pacePerDay > 0){
+      daysRemaining = Math.ceil(remainingLectures / c.pacePerDay);
+      if (daysRemaining <= 0){
+        etaText = 'done!';
+      } else {
+        var eta = new Date(); eta.setHours(0,0,0,0); eta.setDate(eta.getDate() + daysRemaining);
+        etaText = eta.toLocaleDateString(undefined,{month:'short', day:'numeric', year:'numeric'}) + ' (' + daysRemaining + ' day' + (daysRemaining===1?'':'s') + ')';
+      }
+    }
+    return {percent: percent, hoursCompleted: hoursCompleted, hoursRemaining: hoursRemaining, etaText: etaText, remainingLectures: remainingLectures};
+  }
+  function progressColor(percent){
+    if (percent >= 80) return 'var(--green)';
+    if (percent >= 40) return 'var(--teal)';
+    if (percent >= 1) return 'var(--amber)';
+    return 'var(--gray)';
+  }
+
+  /* ---------- render: dashboard ---------- */
+  function renderDashboard(){
+    var hour = new Date().getHours();
+    var greet = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+    document.getElementById('greeting').textContent = greet + '.';
+
+    var activeJobs = state.jobs.filter(function(j){ return j.status !== 'Rejected' && j.status !== 'Closed'; });
+    var upcoming = state.jobs.filter(function(j){
+      var d = daysUntil(j.deadline);
+      return d !== null && d >= 0 && d <= 7 && j.status !== 'Rejected' && j.status !== 'Closed';
+    });
+    var inProgress = state.skills.filter(function(s){ return s.level === 1 || s.level === 2; });
+    var pendingQueue = state.queue.filter(function(q){ return !q.done; });
+
+    document.getElementById('statJobs').textContent = activeJobs.length;
+    document.getElementById('statDeadlines').textContent = upcoming.length;
+    document.getElementById('statSkills').textContent = inProgress.length;
+    document.getElementById('statQueue').textContent = pendingQueue.length;
+
+    var jsDay = new Date().getDay(); // 0 = Sun
+    var todayKey = DAYS[(jsDay + 6) % 7];
+    var slots = state.timetable[todayKey] || [];
+    var todayHtml = '';
+    if (!slots.length){
+      todayHtml = '<div class="empty">Nothing on the timetable for today. Add a block in Study Timetable.</div>';
+    } else {
+      slots.forEach(function(s){
+        todayHtml += '<div class="slot-row"><span class="slot-time">' + esc(s.time) + '</span><span>' + esc(s.subject) + '</span></div>';
+      });
+    }
+    document.getElementById('dashToday').innerHTML = todayHtml;
+
+    var top3 = pendingQueue.slice(0,3);
+    var queueHtml = '';
+    if (!top3.length){
+      queueHtml = '<div class="empty">Your queue is empty. Head to Study Next to add or auto-suggest tasks.</div>';
+    } else {
+      top3.forEach(function(q){
+        queueHtml += '<div class="slot-row"><span>' + esc(q.title) + '</span>' +
+          '<span class="badge" style="background:' + PRIORITY_COLOR[q.priority] + '">' + esc(q.priority) + '</span></div>';
+      });
+    }
+    document.getElementById('dashQueue').innerHTML = queueHtml;
+
+    if (state.courses.length){
+      var avgPct = Math.round(state.courses.reduce(function(sum,c){ return sum + courseStats(c).percent; }, 0) / state.courses.length);
+      document.getElementById('statCourses').textContent = avgPct + '%';
+    } else {
+      document.getElementById('statCourses').textContent = '—';
+    }
+
+    var dashCoursesEl = document.getElementById('dashCourses');
+    if (!state.courses.length){
+      dashCoursesEl.innerHTML = '<div class="empty">No courses yet. Add one in Course Tracker to see your backlog here.</div>';
+    } else {
+      var byBacklog = state.courses.slice().sort(function(a,b){ return courseStats(a).percent - courseStats(b).percent; }).slice(0,4);
+      dashCoursesEl.innerHTML = byBacklog.map(function(c){
+        var st = courseStats(c);
+        return '<div class="dash-course-row">' +
+          '<div class="dash-course-top"><span>' + esc(c.name) + '</span><span>' + st.percent + '%</span></div>' +
+          '<div class="progress-track"><div class="progress-fill" style="width:' + st.percent + '%; background:' + progressColor(st.percent) + ';"></div></div>' +
+        '</div>';
+      }).join('');
+    }
+  }
+
+  /* ---------- render: jobs ---------- */
+  function renderJobs(){
+    var list = document.getElementById('jobsList');
+    var sorted = state.jobs.slice().sort(function(a,b){
+      var da = a.deadline || '9999-99-99', db = b.deadline || '9999-99-99';
+      return da.localeCompare(db);
+    });
+    if (!sorted.length){
+      list.innerHTML = '<div class="empty">No postings yet. Paste in your first one above to start tracking its deadline and the skills it wants.</div>';
+      return;
+    }
+    list.innerHTML = sorted.map(function(j){
+      var d = daysUntil(j.deadline);
+      var dueText = j.deadline ? fmtDate(j.deadline) + (d!==null ? ' · ' + (d<0 ? 'past due' : d===0 ? 'due today' : d+' day'+(d===1?'':'s')+' left') : '') : 'No deadline set';
+      var skillTags = j.skills.map(function(sk){
+        var s = state.skills.find(function(x){ return x.name.toLowerCase()===sk.toLowerCase(); });
+        var color = s ? LEVELS[s.level].color : '#9CA8A1';
+        return '<span class="tag"><span class="tag-dot" style="background:' + color + '"></span>' + esc(sk) + '</span>';
+      }).join('');
+      return '<div class="item-card" data-id="' + j.id + '">' +
+        '<div class="item-top">' +
+          '<div>' +
+            '<div class="item-title">' + esc(j.title || 'Untitled role') + (j.link ? ' <a href="' + esc(j.link) + '" target="_blank" rel="noopener" style="font-size:12px; color:var(--teal);">link ↗</a>' : '') + '</div>' +
+            '<div class="item-sub">' + esc(j.company || 'Unknown company') + ' · ' + dueText + '</div>' +
+          '</div>' +
+          '<div class="item-actions">' +
+            '<span class="badge" style="background:' + STATUS[j.status] + '">' + esc(j.status) + '</span>' +
+            '<button class="icon-btn" data-act="edit-job" data-id="' + j.id + '">Edit</button>' +
+            '<button class="icon-btn danger" data-act="del-job" data-id="' + j.id + '">Delete</button>' +
+          '</div>' +
+        '</div>' +
+        (j.notes ? '<div class="item-sub" style="margin-top:8px;">' + esc(j.notes) + '</div>' : '') +
+        (skillTags ? '<div class="item-meta">' + skillTags + '</div>' : '') +
+      '</div>';
+    }).join('');
+  }
+
+  function resetJobForm(){
+    editingJobId = null;
+    document.getElementById('jobTitle').value = '';
+    document.getElementById('jobCompany').value = '';
+    document.getElementById('jobDeadline').value = '';
+    document.getElementById('jobStatus').value = 'Saved';
+    document.getElementById('jobLink').value = '';
+    document.getElementById('jobSkills').value = '';
+    document.getElementById('jobNotes').value = '';
+    document.getElementById('jobSubmit').textContent = 'Add posting';
+    document.getElementById('jobCancel').style.display = 'none';
+  }
+
+  /* ---------- render: timetable ---------- */
+  function renderDayPills(){
+    document.getElementById('dayPills').innerHTML = DAYS.map(function(d){
+      return '<button class="day-pill' + (d===currentDay?' active':'') + '" data-day="' + d + '">' + d + '</button>';
+    }).join('');
+  }
+  function renderSlots(){
+    var slots = state.timetable[currentDay] || [];
+    var el = document.getElementById('slotsList');
+    if (!slots.length){
+      el.innerHTML = '<div class="empty">Nothing scheduled for ' + currentDay + ' yet. Add a time block above.</div>';
+      return;
+    }
+    el.innerHTML = slots.map(function(s){
+      return '<div class="slot-row"><div><span class="slot-time">' + esc(s.time) + '</span> ' + esc(s.subject) + '</div>' +
+        '<button class="icon-btn danger" data-act="del-slot" data-id="' + s.id + '">Remove</button></div>';
+    }).join('');
+  }
+
+  /* ---------- render: skills ---------- */
+  function renderSkills(){
+    var list = document.getElementById('skillsList');
+    if (!state.skills.length){
+      list.innerHTML = '<div class="empty">No skills tracked yet. They\'ll appear here automatically when you add job postings — or add one yourself above.</div>';
+      return;
+    }
+    var sorted = state.skills.slice().sort(function(a,b){ return a.level - b.level; });
+    list.innerHTML = sorted.map(function(s){
+      var neededBy = jobsNeedingSkill(s.name);
+      return '<div class="item-card" data-id="' + s.id + '">' +
+        '<div class="item-top">' +
+          '<div>' +
+            '<div class="item-title">' + esc(s.name) + '</div>' +
+            (neededBy.length ? '<div class="item-sub">Needed for ' + neededBy.map(function(j){return esc(j.title||'a role');}).join(', ') + '</div>' : '') +
+            (s.resource ? '<div class="item-sub"><a href="' + esc(s.resource) + '" target="_blank" rel="noopener" style="color:var(--teal);">study resource ↗</a></div>' : '') +
+          '</div>' +
+          '<div class="item-actions">' +
+            '<button class="icon-btn" data-act="cycle-skill" data-id="' + s.id + '" title="Click to advance level">' + runwayHTML(s.level, true) + '</button>' +
+            '<button class="icon-btn" data-act="edit-skill" data-id="' + s.id + '">Edit</button>' +
+            '<button class="icon-btn danger" data-act="del-skill" data-id="' + s.id + '">Delete</button>' +
+          '</div>' +
+        '</div>' +
+        (s.notes ? '<div class="item-sub" style="margin-top:8px;">' + esc(s.notes) + '</div>' : '') +
+      '</div>';
+    }).join('');
+  }
+  function resetSkillForm(){
+    editingSkillId = null;
+    document.getElementById('skillName').value = '';
+    document.getElementById('skillResource').value = '';
+    document.getElementById('skillNotes').value = '';
+    document.getElementById('skillSubmit').textContent = 'Add skill';
+    document.getElementById('skillCancel').style.display = 'none';
+  }
+
+  /* ---------- render: queue ---------- */
+  function renderQueueSkillOptions(){
+    var sel = document.getElementById('queueSkill');
+    var current = sel.value;
+    sel.innerHTML = '<option value="">— none —</option>' + state.skills.map(function(s){
+      return '<option value="' + s.id + '">' + esc(s.name) + '</option>';
+    }).join('');
+    sel.value = current;
+  }
+  function renderQueue(){
+    renderQueueSkillOptions();
+    var list = document.getElementById('queueList');
+    if (!state.queue.length){
+      list.innerHTML = '<div class="empty">Your study queue is empty. Add a task, or click "Suggest from skills" to pull in what needs the most work.</div>';
+      return;
+    }
+    list.innerHTML = state.queue.map(function(q, idx){
+      var skill = state.skills.find(function(s){ return s.id === q.skillId; });
+      return '<div class="item-card queue-item' + (q.done?' is-done':'') + '" data-id="' + q.id + '">' +
+        '<div class="item-top" style="width:100%;">' +
+          '<div style="display:flex; gap:12px; align-items:flex-start;">' +
+            '<div class="queue-check' + (q.done?' done':'') + '" data-act="toggle-queue" data-id="' + q.id + '">' + (q.done?'✓':'') + '</div>' +
+            '<div>' +
+              '<div class="item-title">' + esc(q.title) + '</div>' +
+              '<div class="item-sub">' + (skill ? esc(skill.name) + ' · ' : '') + (q.minutes ? q.minutes + ' min' : 'no estimate') + '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="item-actions">' +
+            '<span class="badge" style="background:' + PRIORITY_COLOR[q.priority] + '">' + esc(q.priority) + '</span>' +
+            '<div class="reorder">' +
+              '<button class="icon-btn" data-act="up-queue" data-id="' + q.id + '" ' + (idx===0?'disabled style="opacity:.3"':'') + '>↑</button>' +
+              '<button class="icon-btn" data-act="down-queue" data-id="' + q.id + '" ' + (idx===state.queue.length-1?'disabled style="opacity:.3"':'') + '>↓</button>' +
+            '</div>' +
+            '<button class="icon-btn danger" data-act="del-queue" data-id="' + q.id + '">Delete</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  /* ---------- render: courses ---------- */
+  function renderCourses(){
+    var list = document.getElementById('coursesList');
+    if (!state.courses.length){
+      list.innerHTML = '<div class="empty">No courses yet. Add one above — total lectures, how many you\'ve done, and how long each one runs.</div>';
+      return;
+    }
+    var sorted = state.courses.slice().sort(function(a,b){ return courseStats(a).percent - courseStats(b).percent; });
+    list.innerHTML = sorted.map(function(c){
+      var st = courseStats(c);
+      return '<div class="item-card" data-id="' + c.id + '">' +
+        '<div class="item-top">' +
+          '<div style="flex:1;">' +
+            '<div class="item-title">' + esc(c.name) + '</div>' +
+            '<div class="progress-row">' +
+              '<div class="progress-track"><div class="progress-fill" style="width:' + st.percent + '%; background:' + progressColor(st.percent) + ';"></div></div>' +
+              '<div class="progress-pct">' + st.percent + '%</div>' +
+            '</div>' +
+            '<div class="course-stats">' +
+              '<div class="course-stat"><b>' + (c.completedLectures||0) + ' / ' + (c.totalLectures||0) + '</b> lectures</div>' +
+              '<div class="course-stat"><b>' + st.hoursCompleted.toFixed(1) + 'h</b> done</div>' +
+              '<div class="course-stat"><b>' + st.hoursRemaining.toFixed(1) + 'h</b> left</div>' +
+              '<div class="course-stat">ETA: <b>' + st.etaText + '</b></div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="item-actions">' +
+            '<button class="icon-btn" data-act="edit-course" data-id="' + c.id + '">Edit</button>' +
+            '<button class="icon-btn danger" data-act="del-course" data-id="' + c.id + '">Delete</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+  function resetCourseForm(){
+    editingCourseId = null;
+    document.getElementById('courseName').value = '';
+    document.getElementById('courseMinutes').value = '';
+    document.getElementById('courseTotal').value = '';
+    document.getElementById('courseCompleted').value = '';
+    document.getElementById('coursePace').value = '';
+    document.getElementById('courseSubmit').textContent = 'Add course';
+    document.getElementById('courseCancel').style.display = 'none';
+  }
+
+  /* ---------- render all ---------- */
+  function renderAll(){
+    renderBanner();
+    renderDashboard();
+    renderJobs();
+    renderDayPills();
+    renderSlots();
+    renderCourses();
+    renderSkills();
+    renderQueue();
+  }
+
+  /* ---------- persistence helpers ---------- */
+  async function saveJobs(){ await storeSet('jobs', state.jobs); }
+  async function saveSkills(){ await storeSet('skills', state.skills); }
+  async function saveTimetable(){ await storeSet('timetable', state.timetable); }
+  async function saveQueue(){ await storeSet('queue', state.queue); }
+  async function saveCourses(){ await storeSet('courses', state.courses); }
+
+  /* ---------- nav ---------- */
+  document.querySelectorAll('.nav-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var view = btn.dataset.view;
+      document.querySelectorAll('.view').forEach(function(v){ v.classList.remove('active'); });
+      document.getElementById('view-' + view).classList.add('active');
+      document.querySelectorAll('.nav-btn').forEach(function(b){ b.classList.toggle('active', b===btn); });
+    });
+  });
+
+  /* ---------- jobs interactions ---------- */
+  document.getElementById('jobSubmit').addEventListener('click', async function(){
+    var title = document.getElementById('jobTitle').value.trim();
+    if (!title){ document.getElementById('jobTitle').focus(); return; }
+    var skillsRaw = document.getElementById('jobSkills').value.split(',').map(function(s){return s.trim();}).filter(Boolean);
+
+    if (editingJobId){
+      var job = state.jobs.find(function(j){ return j.id === editingJobId; });
+      job.title = title;
+      job.company = document.getElementById('jobCompany').value.trim();
+      job.deadline = document.getElementById('jobDeadline').value;
+      job.status = document.getElementById('jobStatus').value;
+      job.link = document.getElementById('jobLink').value.trim();
+      job.skills = skillsRaw;
+      job.notes = document.getElementById('jobNotes').value.trim();
+    } else {
+      state.jobs.push({
+        id: uid(),
+        title: title,
+        company: document.getElementById('jobCompany').value.trim(),
+        deadline: document.getElementById('jobDeadline').value,
+        status: document.getElementById('jobStatus').value,
+        link: document.getElementById('jobLink').value.trim(),
+        skills: skillsRaw,
+        notes: document.getElementById('jobNotes').value.trim()
+      });
+    }
+    skillsRaw.forEach(findOrCreateSkill);
+    await saveJobs(); await saveSkills();
+    resetJobForm();
+    renderAll();
+  });
+  document.getElementById('jobCancel').addEventListener('click', resetJobForm);
+
+  document.getElementById('jobsList').addEventListener('click', async function(e){
+    var btn = e.target.closest('[data-act]');
+    if (!btn) return;
+    var id = btn.dataset.id;
+    if (btn.dataset.act === 'del-job'){
+      state.jobs = state.jobs.filter(function(j){ return j.id !== id; });
+      await saveJobs(); renderAll();
+    } else if (btn.dataset.act === 'edit-job'){
+      var j = state.jobs.find(function(x){ return x.id === id; });
+      if (!j) return;
+      editingJobId = id;
+      document.getElementById('jobTitle').value = j.title;
+      document.getElementById('jobCompany').value = j.company;
+      document.getElementById('jobDeadline').value = j.deadline || '';
+      document.getElementById('jobStatus').value = j.status;
+      document.getElementById('jobLink').value = j.link || '';
+      document.getElementById('jobSkills').value = j.skills.join(', ');
+      document.getElementById('jobNotes').value = j.notes || '';
+      document.getElementById('jobSubmit').textContent = 'Save changes';
+      document.getElementById('jobCancel').style.display = 'inline-block';
+      window.scrollTo({top:0, behavior:'smooth'});
+    }
+  });
+
+  /* ---------- timetable interactions ---------- */
+  document.getElementById('dayPills').addEventListener('click', function(e){
+    var btn = e.target.closest('.day-pill');
+    if (!btn) return;
+    currentDay = btn.dataset.day;
+    renderDayPills(); renderSlots();
+  });
+  document.getElementById('slotSubmit').addEventListener('click', async function(){
+    var time = document.getElementById('slotTime').value.trim();
+    var subject = document.getElementById('slotSubject').value.trim();
+    if (!subject) { document.getElementById('slotSubject').focus(); return; }
+    state.timetable[currentDay].push({id: uid(), time: time || '—', subject: subject});
+    await saveTimetable();
+    document.getElementById('slotTime').value = '';
+    document.getElementById('slotSubject').value = '';
+    renderSlots();
+  });
+  document.getElementById('slotsList').addEventListener('click', async function(e){
+    var btn = e.target.closest('[data-act="del-slot"]');
+    if (!btn) return;
+    state.timetable[currentDay] = state.timetable[currentDay].filter(function(s){ return s.id !== btn.dataset.id; });
+    await saveTimetable();
+    renderSlots();
+  });
+
+  /* ---------- course interactions ---------- */
+  document.getElementById('courseSubmit').addEventListener('click', async function(){
+    var name = document.getElementById('courseName').value.trim();
+    var total = parseInt(document.getElementById('courseTotal').value) || 0;
+    if (!name || total <= 0){
+      document.getElementById(!name ? 'courseName' : 'courseTotal').focus();
+      return;
+    }
+    var completed = parseInt(document.getElementById('courseCompleted').value) || 0;
+    var minutes = parseInt(document.getElementById('courseMinutes').value) || 45;
+    var pace = parseFloat(document.getElementById('coursePace').value) || 0;
+
+    if (editingCourseId){
+      var c = state.courses.find(function(x){ return x.id === editingCourseId; });
+      c.name = name; c.totalLectures = total; c.completedLectures = completed;
+      c.lectureMinutes = minutes; c.pacePerDay = pace;
+    } else {
+      state.courses.push({
+        id: uid(), name: name, totalLectures: total, completedLectures: completed,
+        lectureMinutes: minutes, pacePerDay: pace
+      });
+    }
+    await saveCourses();
+    resetCourseForm();
+    renderAll();
+  });
+  document.getElementById('courseCancel').addEventListener('click', resetCourseForm);
+
+  document.getElementById('coursesList').addEventListener('click', async function(e){
+    var btn = e.target.closest('[data-act]');
+    if (!btn) return;
+    var id = btn.dataset.id;
+    if (btn.dataset.act === 'del-course'){
+      state.courses = state.courses.filter(function(c){ return c.id !== id; });
+      await saveCourses(); renderAll();
+    } else if (btn.dataset.act === 'edit-course'){
+      var c = state.courses.find(function(x){ return x.id === id; });
+      if (!c) return;
+      editingCourseId = id;
+      document.getElementById('courseName').value = c.name;
+      document.getElementById('courseMinutes').value = c.lectureMinutes || '';
+      document.getElementById('courseTotal').value = c.totalLectures || '';
+      document.getElementById('courseCompleted').value = c.completedLectures || '';
+      document.getElementById('coursePace').value = c.pacePerDay || '';
+      document.getElementById('courseSubmit').textContent = 'Save changes';
+      document.getElementById('courseCancel').style.display = 'inline-block';
+      window.scrollTo({top:0, behavior:'smooth'});
+    }
+  });
+
+  /* ---------- skills interactions ---------- */
+  document.getElementById('skillSubmit').addEventListener('click', async function(){
+    var name = document.getElementById('skillName').value.trim();
+    if (!name){ document.getElementById('skillName').focus(); return; }
+    if (editingSkillId){
+      var s = state.skills.find(function(x){ return x.id === editingSkillId; });
+      s.name = name;
+      s.resource = document.getElementById('skillResource').value.trim();
+      s.notes = document.getElementById('skillNotes').value.trim();
+    } else {
+      var existing = state.skills.find(function(x){ return x.name.toLowerCase() === name.toLowerCase(); });
+      if (existing){
+        existing.resource = document.getElementById('skillResource').value.trim() || existing.resource;
+        existing.notes = document.getElementById('skillNotes').value.trim() || existing.notes;
+      } else {
+        state.skills.push({id: uid(), name: name, level:0, resource: document.getElementById('skillResource').value.trim(), notes: document.getElementById('skillNotes').value.trim()});
+      }
+    }
+    await saveSkills();
+    resetSkillForm();
+    renderAll();
+  });
+  document.getElementById('skillCancel').addEventListener('click', resetSkillForm);
+
+  document.getElementById('skillsList').addEventListener('click', async function(e){
+    var btn = e.target.closest('[data-act]');
+    if (!btn) return;
+    var id = btn.dataset.id;
+    if (btn.dataset.act === 'del-skill'){
+      state.skills = state.skills.filter(function(s){ return s.id !== id; });
+      await saveSkills(); renderAll();
+    } else if (btn.dataset.act === 'cycle-skill'){
+      var s = state.skills.find(function(x){ return x.id === id; });
+      if (s){ s.level = (s.level + 1) % 4; await saveSkills(); renderSkills(); renderDashboard(); renderJobs(); }
+    } else if (btn.dataset.act === 'edit-skill'){
+      var sk = state.skills.find(function(x){ return x.id === id; });
+      if (!sk) return;
+      editingSkillId = id;
+      document.getElementById('skillName').value = sk.name;
+      document.getElementById('skillResource').value = sk.resource || '';
+      document.getElementById('skillNotes').value = sk.notes || '';
+      document.getElementById('skillSubmit').textContent = 'Save changes';
+      document.getElementById('skillCancel').style.display = 'inline-block';
+      window.scrollTo({top:0, behavior:'smooth'});
+    }
+  });
+
+  /* ---------- queue interactions ---------- */
+  document.getElementById('queueSubmit').addEventListener('click', async function(){
+    var title = document.getElementById('queueTitle').value.trim();
+    if (!title){ document.getElementById('queueTitle').focus(); return; }
+    state.queue.unshift({
+      id: uid(),
+      title: title,
+      skillId: document.getElementById('queueSkill').value || null,
+      priority: document.getElementById('queuePriority').value,
+      minutes: parseInt(document.getElementById('queueMinutes').value) || null,
+      done: false
+    });
+    await saveQueue();
+    document.getElementById('queueTitle').value = '';
+    document.getElementById('queueMinutes').value = '';
+    renderQueue(); renderDashboard();
+  });
+
+  document.getElementById('suggestBtn').addEventListener('click', async function(){
+    var existingSkillIds = new Set(state.queue.map(function(q){ return q.skillId; }));
+    var candidates = state.skills.filter(function(s){ return (s.level === 0 || s.level === 1) && !existingSkillIds.has(s.id); });
+    candidates.sort(function(a,b){ return a.level - b.level; });
+    candidates.forEach(function(s){
+      state.queue.unshift({
+        id: uid(),
+        title: 'Study: ' + s.name,
+        skillId: s.id,
+        priority: s.level === 0 ? 'High' : 'Medium',
+        minutes: null,
+        done: false
+      });
+    });
+    if (candidates.length){
+      await saveQueue();
+      renderQueue(); renderDashboard();
+    }
+  });
+
+  document.getElementById('queueList').addEventListener('click', async function(e){
+    var btn = e.target.closest('[data-act]');
+    if (!btn) return;
+    var id = btn.dataset.id;
+    var idx = state.queue.findIndex(function(q){ return q.id === id; });
+    if (idx === -1) return;
+    if (btn.dataset.act === 'del-queue'){
+      state.queue.splice(idx,1);
+    } else if (btn.dataset.act === 'toggle-queue'){
+      state.queue[idx].done = !state.queue[idx].done;
+    } else if (btn.dataset.act === 'up-queue' && idx > 0){
+      var tmp = state.queue[idx-1]; state.queue[idx-1] = state.queue[idx]; state.queue[idx] = tmp;
+    } else if (btn.dataset.act === 'down-queue' && idx < state.queue.length-1){
+      var tmp2 = state.queue[idx+1]; state.queue[idx+1] = state.queue[idx]; state.queue[idx] = tmp2;
+    }
+    await saveQueue();
+    renderQueue(); renderDashboard();
+  });
+
+  /* ---------- reset ---------- */
+  document.getElementById('resetBtn').addEventListener('click', async function(){
+    if (!confirm('Clear everything — job postings, timetable, skills, courses, and queue? This can\'t be undone.')) return;
+    state.jobs = []; state.skills = [];
+    state.timetable = {Mon:[],Tue:[],Wed:[],Thu:[],Fri:[],Sat:[],Sun:[]};
+    state.queue = []; state.courses = [];
+    await storeDeleteAll();
+    renderAll();
+  });
+
+  /* ---------- init ---------- */
+  async function init(){
+    state.jobs = await storeGet('jobs', []);
+    state.skills = await storeGet('skills', []);
+    state.timetable = await storeGet('timetable', {Mon:[],Tue:[],Wed:[],Thu:[],Fri:[],Sat:[],Sun:[]});
+    state.queue = await storeGet('queue', []);
+    state.courses = await storeGet('courses', []);
+    renderAll();
+  }
+  init();
+
+})();
+</script>
+</body>
+</html>
